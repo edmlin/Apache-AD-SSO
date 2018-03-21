@@ -6,22 +6,22 @@ http://www.grolmsnet.de/kerbtut/
 
 https://docs.typo3.org/typo3cms/extensions/ig_ldap_sso_auth/2.1.1/AdministratorManual/ConfigureApacheKerberos.html
 
-1. 安装软件包
+#### 1. 安装软件包
 ```
 yum install httpd  
 yum install php  
 yum install krb5-devel krb5-libs krb5-workstation mod_auth_kerb  
 ```
-2. 生成keytab文件
+#### 2. 生成keytab文件
 
 On DC:  
     ktpass /out webserver.keytab /princ HTTP/web.smallbusiness1.local@SMALLBUSINESS1.LOCAL /mapuser smallbusiness1\webauth /pass Test1234 /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt
 
-3. 把keytab文件copy到/etc/httpd/
+#### 3. 把keytab文件copy到/etc/httpd/
 
-4. DNS建立A记录和PTR记录指向web server
+#### 4. DNS建立A记录和PTR记录指向web server
 
-5. In /etc/krb5.conf
+#### 5. In /etc/krb5.conf
 ```
     [libdefaults]  
     default_keytab_name = /etc/httpd/webserver.keytab  
@@ -41,13 +41,13 @@ On DC:
 ```
  （注意：SMALLBUSINESS1.LOCAL需要大写）
 
-6. 测试（注意：SMALLBUSINESS1.LOCAL需要大写）：
+#### 6. 测试（注意：SMALLBUSINESS1.LOCAL需要大写）：
 
     kinit user@SMALLBUSINESS1.LOCAL
 
     klist
 
-7. Apache配置
+#### 7. Apache配置
 
 In /etc/httpd/conf/httpd.conf:
 
@@ -68,15 +68,15 @@ In /etc/httpd/conf.modules.d/10-auth_kerb.conf:
     require valid-user  
     </Location>  
 
-8. IE设置
+#### 8. IE设置
 
 Internet Option->Security->Local intranet->Sites->Add web.smallbusiness1.local  
 
 Internet Option->Security->Local intranet->Custom Level->User Authentication->Logon->Automatic logon only in Intranet zone
 
-9. 打开IE，打开web.smallbusiness1.local/phpinfo.php.（注意，不能用IP地址）
+#### 9. 打开IE，打开web.smallbusiness1.local/phpinfo.php.（注意，不能用IP地址）
 
-Note:
+#### Note:
 
 1. Web server的时间要和DC的时间一致。
 
@@ -84,9 +84,9 @@ Note:
 
  
 
-Update: 支持多个domain
+### Update: 支持多个domain
 
-1. 在每个domain的DC分别生成webserver1.keytab和webserver2.keytab，注意两个命令中HTTP/web.smallbusiness1.local是一样地，对应httpd.conf中的ServerName:
+#### 1. 在每个domain的DC分别生成webserver1.keytab和webserver2.keytab，注意两个命令中HTTP/web.smallbusiness1.local是一样地，对应httpd.conf中的ServerName:
 
 在smallbusiness1.local的DC:  
 ktpass /out webserver1.keytab /princ HTTP/web.smallbusiness1.local@SMALLBUSINESS1.LOCAL /mapuser smallbusiness1\webauth /pass Test1234 /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt
@@ -96,7 +96,7 @@ ktpass /out webserver2.keytab /princ HTTP/web.smallbusiness1.local@SMALLBUSINESS
 
  
 
-2. 用ktutil合并keytab文件：
+#### 2. 用ktutil合并keytab文件：
 ```
     ktutil  
     rkt webserver1.keytab  
@@ -106,7 +106,7 @@ ktpass /out webserver2.keytab /princ HTTP/web.smallbusiness1.local@SMALLBUSINESS
 ```
 用ktlist -k webserver.keytab 验证webserver.keytab中包含了多个key。
 
-3. 修改krb5.conf中的[realms]和[domain_realm]：
+#### 3. 修改krb5.conf中的[realms]和[domain_realm]：
 ```
     [realms]  
     SMALLBUSINESS1.LOCAL = {  
@@ -126,7 +126,7 @@ ktpass /out webserver2.keytab /princ HTTP/web.smallbusiness1.local@SMALLBUSINESS
     .smallbusiness2.local = SMALLBUSINESS2.LOCAL  
     smallbusiness2.local = SMALLBUSINESS2.LOCAL  
 ```
-4. In /etc/httpd/conf.modules.d/10-auth_kerb.conf:
+#### 4. In /etc/httpd/conf.modules.d/10-auth_kerb.conf:
 ```
     LoadModule auth_kerb_module modules/mod_auth_kerb.so  
     <Location />  
